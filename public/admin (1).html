@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | NeepcoStay</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div style="padding: 50px;">
+        <h1>Admin Dashboard</h1>
+        <div id="stats" style="margin-bottom: 20px; font-weight: bold;"></div>
+        <table border="1" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Guest Name</th>
+                    <th>Email</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Rooms</th>
+                    <th>Room Type</th>
+                </tr>
+            </thead>
+            <tbody id="bookingTable"></tbody>
+        </table>
+        <br>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        async function fetchBookings() {
+            const response = await fetch('/api/admin/bookings');
+            const bookings = await response.json();
+            const table = document.getElementById('bookingTable');
+            
+            document.getElementById('stats').innerText = `Total Rooms Booked: ${bookings.reduce((sum, b) => sum + b.numRooms, 0)}`;
+
+            table.innerHTML = bookings.map(b => `
+                <tr>
+                    <td>${b.id}</td>
+                    <td>${b.fullName}</td>
+                    <td>${b.email}</td>
+                    <td>${b.checkInDate}</td>
+                    <td>${b.checkOutDate}</td>
+                    <td>${b.numRooms}</td>
+                    <td>${b.roomType}</td>
+                </tr>
+            `).join('');
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        if (localStorage.getItem('userRole') !== 'admin') {
+            window.location.href = 'login.html';
+        } else {
+            fetchBookings();
+        }
+    </script>
+</body>
+</html>

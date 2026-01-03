@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings | NeepcoStay</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div style="padding: 50px;">
+        <h1>Your Bookings</h1>
+        <div id="guestBookings"></div>
+        <br>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        async function fetchMyBookings() {
+            const email = localStorage.getItem('userEmail');
+            const response = await fetch(`/api/guest/bookings?email=${email}`);
+            const bookings = await response.json();
+            const container = document.getElementById('guestBookings');
+
+            if (bookings.length === 0) {
+                container.innerHTML = "<p>You have no active bookings.</p>";
+            } else {
+                container.innerHTML = bookings.map(b => `
+                    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
+                        <p><strong>Room Type:</strong> ${b.roomType}</p>
+                        <p><strong>Stay:</strong> ${b.checkInDate} to ${b.checkOutDate}</p>
+                        <p><strong>Rooms:</strong> ${b.numRooms}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        if (!localStorage.getItem('userEmail')) {
+            window.location.href = 'login.html';
+        } else {
+            fetchMyBookings();
+        }
+    </script>
+</body>
+</html>
